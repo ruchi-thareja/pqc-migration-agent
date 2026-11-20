@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+evals/runs*/
+pqc_report.md
+.DS_Store
