@@ -106,14 +106,14 @@ It runs N times to measure consistency, because the agent is non-deterministic. 
 | Input tokens per run | 21.5k (identical every run) | 31k / 31k / 54k |
 | Output tokens per run | 6.3k – 6.6k | 10.7k / 10.7k / 15.6k |
 | Robustness | no failures | once submitted an empty report (ran out of output tokens inside the tool call); now recovered automatically |
-| Cost per report | _TBD_ | _TBD_ |
+| Cost per report (approx.) | ~$0.11 | ~$0.01 |
 
-Total spend for all development and eval runs, about 10 full reports: **$0.49**.
+Total spend for all development and eval runs: **$0.49**. That's $0.43 on Sonnet (4 full reports) and $0.05 on Haiku (about 5 runs, one of them cut short by the crash). Per-report figures are these totals divided by the number of runs, so they're approximate.
 
 What the results show:
 - **Both models pass every rubric check, so the rubric has saturated.** It can no longer tell them apart. Next step: a model-graded quality eval.
 - **Sonnet was fully consistent.** It read all 11 relevant files and looked up guidance in parallel in a single turn, every run. Its input tokens were identical across runs, so cost is predictable.
-- **Haiku is cheaper per token but used 1.5–2.5× more tokens**, needed more turns and varied more between runs. So the cheaper model is not proportionally cheaper.
+- **Haiku used 1.5–2.5× more tokens and more turns, yet was still about 10× cheaper per report**, because its per-token price is much lower. The trade-off is not cost. It's consistency (Haiku varied more between runs) and robustness (the truncation failure below). A sensible split: Haiku for frequent, cheap re-runs (e.g. weekly in CI), Sonnet for the report that goes to the CISO.
 - **Haiku once ran out of output budget while writing the report inside the tool call.** The agent now detects an empty submission, tells the model why, and asks for a shorter resubmission. Recovered failures are logged in the eval results.
 - **Two eval findings came from checking the evals themselves:**
   - A first grader version flagged correct reports that mentioned AES-128 in Priority 1 only to say it was *not* a problem. The check now fails only if a report recommends replacing it.
